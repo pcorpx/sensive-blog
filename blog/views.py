@@ -5,7 +5,7 @@ from blog.models import Comment, Post, Tag
 def get_related_posts_count(tag):
     return tag.posts.count()
 
-def get_likes_amount(post):
+def get_likes_count(post):
     return len(post.likes.all())
 
 
@@ -31,8 +31,8 @@ def serialize_tag(tag):
 
 
 def index(request):
-    popular_posts = sorted(list(Post.objects.all()), key=get_likes_amount)
-    most_popular_posts = popular_posts[-5:] # TODO. Как это посчитать?
+    popular_posts = sorted(list(Post.objects.all()), key=get_likes_count)
+    most_popular_posts = popular_posts[-5:]
 
     fresh_posts = Post.objects.order_by('published_at')
     most_fresh_posts = list(fresh_posts)[-5:]
