@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.db.models import Count
+
 from blog.models import Comment, Post, Tag
 
 
@@ -6,7 +8,7 @@ def get_related_posts_count(tag):
     return tag.posts.count()
 
 def get_likes_count(post):
-    return len(post.likes.all())
+    return post.likes_count
 
 
 def serialize_post(post):
@@ -31,9 +33,10 @@ def serialize_tag(tag):
 
 
 def index(request):
-    popular_posts = sorted(list(Post.objects.all()[:20]), key=get_likes_count)
-    most_popular_posts = popular_posts[-5:]
-    #most_popular_posts = []
+    popular_posts = sorted(Post.objects.annotate(likes_count=Count('likes')),
+        key=get_likes_count
+        )
+    most_popular_posts = list(popular_posts)[-5:]
 
     fresh_posts = Post.objects.order_by('published_at')
     most_fresh_posts = list(fresh_posts)[-5:]
