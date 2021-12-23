@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.db.models import Count, Subquery
+from django.db.models import Count
+from django.http import Http404
 
 from blog.models import Comment, Post, Tag
 
@@ -58,7 +59,10 @@ def index(request):
 
 
 def post_detail(request, slug):
-    post = Post.objects.select_related('author').get(slug=slug)
+    try:
+        post = Post.objects.select_related('author').get(slug=slug)
+    except Post.DoesNotExist:
+        raise Http404("Post does not exist")
     comments = (Comment.objects.filter(post=post)
         .select_related('author')
     )
